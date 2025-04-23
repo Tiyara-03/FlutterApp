@@ -1,17 +1,15 @@
 class Product {
   final String name;
-  final String description;
-  final String image;
+  final String image; // use path or base64 in real apps
   final double price;
   final String unit;
-  final double rating;
+  final String category; // 👈 NEW FIELD
 
   const Product({
     required this.name,
-    required this.description,
     required this.image,
     required this.price,
     required this.unit,
-    required this.rating,
+    required this.category,
   });
 }
