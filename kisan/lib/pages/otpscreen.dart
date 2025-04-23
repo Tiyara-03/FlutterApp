@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:kisan/main.dart';
+import 'package:kisan/pages/home_page.dart';
 
 class Otpscreen extends StatefulWidget {
   String verificationid;
@@ -46,12 +46,11 @@ class _OtpscreenState extends State<Otpscreen> {
                       smsCode: otpController.text.toString(),
                     );
                 FirebaseAuth.instance.signInWithCredential(credential).then((
-                  value,
-                ) {
-                  Navigator.push(
+                  value) {
+                  Navigator.push( 
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MyHomePage(title: "MyHomePage"),
+                      builder: (context) => HomePage(),
                     ),
                   );
                 });
