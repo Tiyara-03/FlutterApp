@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:kisan/data/products.dart';
+import 'package:kisan/models/product.dart';
+import 'package:kisan/pages/explore_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -16,10 +19,13 @@ class _ProfileFormPageState extends State<ProfilePage> {
   final TextEditingController locationController = TextEditingController();
 
   File? _image;
+  String? _selectedCategory;
+
+  final List<String> _categories = ['Crop', 'Product', 'Renting'];
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.camera);
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedImage != null) {
       setState(() {
@@ -29,11 +35,30 @@ class _ProfileFormPageState extends State<ProfilePage> {
   }
 
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      print("Product: \${productController.text}");
-      print("Price: \${priceController.text}");
-      print("Location: \${locationController.text}");
-      print("Image path: \${_image?.path}");
+    if (_formKey.currentState!.validate() &&
+        _image != null &&
+        _selectedCategory != null) {
+      final newProduct = Product(
+        name: productController.text,
+        image: _image!.path,
+        price: double.parse(priceController.text),
+        unit: 'piece',
+        category: _selectedCategory!,
+      );
+
+      userUploadedProducts.add(newProduct);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${_selectedCategory!} uploaded successfully!')),
+      );
+
+      setState(() {
+        _image = null;
+        productController.clear();
+        priceController.clear();
+        locationController.clear();
+        _selectedCategory = null;
+      });
     }
   }
 
@@ -64,15 +89,14 @@ class _ProfileFormPageState extends State<ProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Weather Widget
             Card(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
               color: Colors.lightBlue[100],
-              child: Padding(
-                padding: const EdgeInsets.all(16),
+              child: const Padding(
+                padding: EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text("🌤️ Weather", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     SizedBox(height: 8),
                     Text("Location: Lalpur"),
@@ -83,8 +107,6 @@ class _ProfileFormPageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Quick Action Grid
             Wrap(
               spacing: 10,
               runSpacing: 10,
@@ -96,8 +118,6 @@ class _ProfileFormPageState extends State<ProfilePage> {
               ],
             ),
             const SizedBox(height: 20),
-
-            // Product Upload Form
             const Text("📤 Upload Product", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             Form(
@@ -120,6 +140,16 @@ class _ProfileFormPageState extends State<ProfilePage> {
                     decoration: const InputDecoration(labelText: 'Location'),
                     validator: (value) => value!.isEmpty ? 'Enter location' : null,
                   ),
+                  const SizedBox(height: 10),
+                  DropdownButtonFormField<String>(
+                    value: _selectedCategory,
+                    items: _categories.map((cat) {
+                      return DropdownMenuItem(value: cat, child: Text(cat));
+                    }).toList(),
+                    onChanged: (value) => setState(() => _selectedCategory = value),
+                    decoration: const InputDecoration(labelText: 'Select Category'),
+                    validator: (value) => value == null ? 'Select a category' : null,
+                  ),
                   const SizedBox(height: 16),
                   _image != null
                       ? Image.file(_image!, height: 200)
@@ -127,8 +157,8 @@ class _ProfileFormPageState extends State<ProfilePage> {
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
                     onPressed: _pickImage,
-                    icon: const Icon(Icons.camera_alt),
-                    label: const Text("Capture Image"),
+                    icon: const Icon(Icons.image),
+                    label: const Text("Choose from Gallery"),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
@@ -138,9 +168,7 @@ class _ProfileFormPageState extends State<ProfilePage> {
                 ],
               ),
             ),
-
             const SizedBox(height: 30),
-            // Expansion Forms
             ExpansionTile(
               title: const Text("Add Crop Details"),
               children: [
