@@ -4,6 +4,7 @@ import 'package:badges/badges.dart' as badges;
 import 'package:kisan/pages/cart_page.dart';
 import 'package:kisan/pages/explore_page.dart';
 import 'package:kisan/pages/profile_page.dart';
+import 'package:kisan/pages/schemes_page.dart';
 import 'package:kisan/pages/services_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,7 +18,7 @@ class _HomePageState extends State<HomePage> {
   final pages = [
     const ExplorePage(),
     const ServicesPage(),
-    const CartPage(),
+    const SchemesPage(),
     const ProfilePage(),
   ];
 
@@ -26,10 +27,123 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const Drawer(),
+      drawer: Drawer(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(color: Colors.green.shade100),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.green.shade700,
+                      child: const Icon(
+                        Icons.person,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          'Tiyara Sharma',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Farmer ID: KS1021',
+                          style: TextStyle(fontSize: 13, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.person_outline),
+                title: const Text('View Profile'),
+                onTap: () {
+                  setState(() {
+                    currentIndex = 3; // ProfilePage
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.info_outline),
+                title: const Text('About App'),
+                onTap: () {
+                  showAboutDialog(
+                    context: context,
+                    applicationName: 'Kissan Samruddhi',
+                    applicationVersion: '1.0.0',
+                    applicationIcon: const Icon(Icons.agriculture),
+                    children: [
+                      const Text(
+                        'This app helps Jharkhand farmers explore schemes, products, and rentals in one place.',
+                      ),
+                    ],
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.settings_outlined),
+                title: const Text('Settings'),
+                onTap: () {
+                  // Can be added later
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Settings coming soon!")),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.support_agent_outlined),
+                title: const Text('Support'),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder:
+                        (context) => AlertDialog(
+                          title: const Text("Need Help?"),
+                          content: const Text(
+                            "Email us at support@kissanapp.in or call 1800-112-123.",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("Close"),
+                            ),
+                          ],
+                        ),
+                  );
+                },
+              ),
+              const Spacer(),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text('Logout'),
+                onTap: () {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/splash',
+                    (route) => false,
+                  );
+                },
+              ),
+            ],
+          ),
+      ),
       appBar: AppBar(
         centerTitle: false,
         title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               "Hii Tiyara 👋",
@@ -56,6 +170,15 @@ class _HomePageState extends State<HomePage> {
                 child: const Icon(IconlyBroken.notification),
               ),
             ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.shopping_cart),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CartPage()),
+              );
+            },
           ),
         ],
       ),
@@ -84,7 +207,7 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(IconlyLight.plus),
             activeIcon: Icon(IconlyBold.plus),
-            label: "Subsidies",
+            label: "Schemes",
           ),
 
           BottomNavigationBarItem(

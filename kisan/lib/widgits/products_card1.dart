@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:kisan/pages/cart_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:kisan/models/product.dart';
 
 class ProductsCard1 extends StatelessWidget {
@@ -57,7 +59,7 @@ class ProductsCard1 extends StatelessWidget {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: "\$${product.price}",
+                            text: "\₹${product.price}",
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           TextSpan(
@@ -72,7 +74,17 @@ class ProductsCard1 extends StatelessWidget {
                       height: 28,
                       child: IconButton.filled(
                         padding: EdgeInsets.zero,
-                        onPressed: () {},
+                        onPressed: () {
+                          Provider.of<CartProvider>(context, listen: false)
+                              .addToCart(product);
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("${product.name} added to cart"),
+                              duration: const Duration(seconds: 1),
+                            ),
+                          );
+                        },
                         icon: const Icon(Icons.add),
                       ),
                     ),
